@@ -2,7 +2,7 @@
   <div class="navbar">
     <div>
       <h3>
-        Batch id: <span class="batch-id">{{ this.$route.params.id }}</span>
+        Process id: <span class="batch-id">{{ this.$route.params.id }}</span>
       </h3>
     </div>
     <div class="toolbar">
@@ -12,8 +12,13 @@
   </div>
   <div class="result-container">
     <progress-bar :progress="this.progress" />
-    <status :pendingItems="this.pending" :isFinished="finished" :failedItems="failed" />
-    <item-count :updated="updated" :created="created" />
+    <status
+      v-if="this.finished"
+      :updated="updated"
+      :created="this.created"
+      :pendingItems="this.pending"
+      :failedItems="this.failed"
+    />
   </div>
   <div id="error-container">
     <errors :errors="this.errors" v-if="errors.length" />
@@ -59,6 +64,8 @@ export default {
         this.finished = res.finished
         this.failed = res.failed
         this.errors = res.errors
+        this.created = res.created
+        this.updated = res.updated
       })
     }
   }
@@ -90,8 +97,9 @@ export default {
 }
 
 #info-container {
-  margin: 20px;
+  margin: 10px 5px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
 }
 </style>

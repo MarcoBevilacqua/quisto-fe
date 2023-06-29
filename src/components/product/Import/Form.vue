@@ -1,7 +1,7 @@
 <template>
   <div class="form-container">
     <div class="header">
-      <span class="upload">Upload Csv File</span>
+      <span class="upload">Upload </span>
     </div>
     <div v-if="loading" class="drop loading">
       <div class="loading-ind">
@@ -71,6 +71,10 @@ export default {
   text-align: center;
   padding: 50px 0;
   padding-bottom: 30px;
+}
+
+.drop.loading {
+  padding: 25px 0;
 }
 
 .loading-ind {

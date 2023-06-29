@@ -3,11 +3,17 @@
     <div class="header">
       <span class="upload">Upload Csv File</span>
     </div>
-    <div class="drop">
+    <div v-if="loading" class="drop loading">
+      <div class="loading-ind">
+        <h3>Processing...</h3>
+      </div>
+    </div>
+    <div class="drop" v-else>
       <form enctype="multipart/form-data" @submit.prevent="upload">
         <div class="select-file">
           <label for="file">Select File</label>
           <input required type="file" name="products" ref="file" />
+          <span class="file-name">{{ fileName }}</span>
         </div>
 
         <div class="import-file">
@@ -21,9 +27,15 @@
 <script>
 import { uploadProductCsv } from '../../../api/product-upload'
 export default {
+  data() {
+    return {
+      loading: false
+    }
+  },
   methods: {
     upload() {
       const formData = new FormData()
+      this.loading = true
       formData.append('products', this.$refs.file.files[0])
       uploadProductCsv(formData).then((resData) => {
         console.log(resData)
@@ -38,12 +50,10 @@ export default {
 .form-container {
   width: 400px;
   margin: 120px auto;
-  border: 5px dashed gray;
+  border: 2px solid gray;
 }
 .header {
   background: #eb6a5a;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
   text-align: center;
 }
 
@@ -61,6 +71,10 @@ export default {
   text-align: center;
   padding: 50px 0;
   padding-bottom: 30px;
+}
+
+.loading-ind {
+  margin: 75px auto;
 }
 
 .select-file {
@@ -93,7 +107,7 @@ label {
   white-space: nowrap;
   text-transform: uppercase;
   font-weight: 400;
-  box-shadow: 0 1px 1px gray;
+  border: 1px solid gray;
 }
 
 input[type='file'] {

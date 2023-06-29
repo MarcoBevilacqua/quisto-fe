@@ -7,54 +7,51 @@
     </div>
     <div class="toolbar">
       <button @click="getProgress">Update Progress</button>
-      <button @click="goHome">Back to import</button>
+      <button class="back-btn" @click="goHome">Back to import</button>
     </div>
   </div>
   <div class="result-container">
-    <div id="progress-container">
-      <div>
-        <h4>Progress:</h4>
-      </div>
-      <div class="meter">
-        <span :style="'width:' + progress + '%'"></span>
-      </div>
-    </div>
-
-    <div id="info-container">
-      <div class="info-item">
-        <h4>
-          Pending: <span class="result">{{ pending }}</span>
-        </h4>
-      </div>
-      <div class="info-item">
-        <h4>
-          Finished: <span class="result">{{ finished }}</span>
-        </h4>
-      </div>
-      <div class="info-item">
-        <h4>
-          Failed: <span class="result">{{ failed }}</span>
-        </h4>
-      </div>
-    </div>
+    <progress-bar :progress="this.progress" />
+    <status :pendingItems="this.pending" :isFinished="finished" :failedItems="failed" />
+    <item-count :updated="updated" :created="created" />
   </div>
   <div id="error-container">
-    <div class="error-container-header">
-      <h3>Errors: {{ errors.length }}</h3>
-    </div>
-    <div class="errors-container" v-if="errors.length">
-      <div class="row" style="display: inline-table" v-for="errorLine in errors">
-        <div>{{ errorLine.uuid }}</div>
-        <div>{{ errorLine.exception }}</div>
-      </div>
-    </div>
+    <errors :errors="this.errors" v-if="errors.length" />
   </div>
 </template>
 
 <script>
 import { getImportStatus } from '../../../api/product-upload'
+import ProgressBar from './dashboard/Progress.vue'
+import Status from './dashboard/Status.vue'
+import ItemCount from './dashboard/ItemCount.vue'
+import Errors from './errors/Errors.vue'
+
 export default {
+  components: {
+    ProgressBar,
+    Status,
+    ItemCount,
+    Errors
+  },
+  mounted() {
+    this.getProgress()
+  },
+  data() {
+    return {
+      progress: 0,
+      pending: 0,
+      failed: 0,
+      finished: false,
+      created: 0,
+      updated: 0,
+      errors: []
+    }
+  },
   methods: {
+    goHome() {
+      this.$router.push('/')
+    },
     getProgress() {
       getImportStatus(this.$route.params.id).then((res) => {
         this.progress = res.progress
@@ -63,18 +60,6 @@ export default {
         this.failed = res.failed
         this.errors = res.errors
       })
-    },
-    goHome() {
-      this.$router.push('/')
-    }
-  },
-  data() {
-    return {
-      progress: 0,
-      pending: 0,
-      failed: 0,
-      finished: 0,
-      errors: []
     }
   }
 }
@@ -85,42 +70,28 @@ export default {
   display: flex;
   justify-content: space-between;
 }
+
+.toolbar button {
+  cursor: pointer;
+  border-radius: 3px;
+  color: white;
+  border: none;
+  margin-right: 5px;
+  padding: 4px 8px;
+  background-color: #4caf50;
+}
+
+.toolbar .back-btn {
+  background-color: #e7e7e7;
+  color: black;
+}
 .batch-id {
   font-weight: 100;
-}
-.meter {
-  box-sizing: content-box;
-  height: 10px;
-  position: relative;
-  background: #555;
-  border-radius: 25px;
-
-  box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
-}
-.meter > span {
-  display: block;
-  height: 100%;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
-  background-color: rgb(43, 194, 83);
-  background-image: linear-gradient(center bottom, rgb(43, 194, 83) 37%, rgb(84, 240, 84) 69%);
-  box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.4);
-  position: relative;
-  overflow: hidden;
-}
-
-#progress-container {
-  margin: 20px auto;
 }
 
 #info-container {
   margin: 20px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-}
-.info-item {
-  text-align: center;
 }
 </style>
